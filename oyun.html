@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siber Yönlendirici - Simülasyon Ekranı</title>
+    <style>
+        /* CSS Değişkenleri ile Merkezi Renk Yönetimi */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            --board-bg: #ffffff;
+            --text-color: #333;
+            --shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: var(--bg-gradient); 
+            color: var(--text-color); 
+            min-height: 100vh;
+        }
+
+        /* Üst Başlık ve Navigasyon */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto 20px auto;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .btn-home {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: bold;
+            padding: 8px 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn-home:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .level-badge { 
+            background: #8e44ad; 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            font-size: 14px; 
+            font-weight: bold;
+        }
+        
+        /* Kontrol Butonları */
+        .controls { 
+            max-width: 1000px; 
+            margin: 0 auto 20px auto; 
+            display: flex;
+            gap: 15px;
+        }
+
+        button { 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            padding: 12px 20px; 
+            font-weight: bold; 
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .btn-undo { background: var(--warning-color); color: white; }
+        .btn-next { background: var(--secondary-color); color: white; display: none; }
+        
+        /* Oyun Düzeni */
+        .game-layout { 
+            display: flex; 
+            gap: 25px; 
+            flex-wrap: wrap; 
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Pano Efekti (Noktalı Arka Plan) */
+        .board-container { 
+            flex: 2;
+            border: 4px solid var(--primary-color); 
+            background-color: var(--board-bg); 
+            /* Fiziksel pano hissi veren noktalı desen */
+            background-image: radial-gradient(#bdc3c7 2px, transparent 2px);
+            background-size: 30px 30px;
+            border-radius: 12px; 
+            padding: 15px; 
+            box-shadow: var(--shadow); 
+            min-width: 600px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Gösterge Paneli (Dashboard) */
+        .dashboard { 
+            flex: 1;
+            background: #fff; 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            min-width: 300px; 
+        }
+
+        .dashboard h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .stat-box p { margin: 5px 0; font-size: 15px; }
+        .stat-value { font-weight: bold; color: var(--primary-color); font-size: 18px; }
+
+        .msg { 
+            padding: 15px; 
+            margin-top: 20px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            display: none; 
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        .msg-success { background: var(--success-color); color: white; }
+        .msg-error { background: var(--accent-color); color: white; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* SVG Çizim Ayarları */
+        svg line { transition: all 0.3s ease; }
+        svg circle { transition: fill 0.3s ease, r 0.2s ease; }
+        svg g:hover circle { r: 18; }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <a href="index.html" class="btn-home">⬅ Ana Sayfa</a>
+        <h2>Siber Yönlendirici Simülasyonu</h2>
+        <div class="level-badge" id="level-display">Seviye 1: Kolay</div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn-undo" onclick="undoLastStep()">↩️ Geri Al (Hata Ayıklama)</button>
+        <button id="next-level-btn" class="btn-next" onclick="loadNextLevel()">➡️ Sonraki Seviyeye Geç</button>
+    </div>
+
+    <div class="game-layout">
+        <div class="board-container">
+            <svg id="gameBoard" width="600" height="400"></svg>
+        </div>
+
+        <div class="dashboard">
+            <h3>📊 Gösterge Paneli</h3>
+            
+            <div class="stat-box">
+                <p>Mevcut Düğüm:</p>
+                <span class="stat-value" id="current-node-display">start</span>
+            </div>
+
+            <div class="stat-box">
+                <p>İzlenen Rota:</p>
+                <span class="stat-value" id="path-display" style="font-size: 14px; word-wrap: break-word;">start</span>
+            </div>
+
+            <div class="stat-box">
+                <p>Toplam Maliyet:</p>
+                <span class="stat-value" id="cost-display" style="font-size: 24px;">0</span> <span style="font-size: 12px; color: #7f8c8d;">birim</span>
+            </div>
+            
+            <div id="success-message" class="msg msg-success">
+                🎉 Hedefe en kısa yoldan ulaştın!
+            </div>
+            <div id="error-message" class="msg msg-error">
+                ❌ Hedefe ulaştın ama daha az maliyetli bir yol var! Geri alıp tekrar dene.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SEVİYE VERİLERİ (Algoritma ve Mantık Aynı Kaldı) ---
+        const levelData = [
+            {
+                name: "Seviye 1: Kolay", firewallCount: 0,
+                nodes: [
+                    { id: 'start', cx: 50, cy: 200, label: 'START' },
+                    { id: 'A', cx: 250, cy: 100, label: 'Sunucu A' },
+                    { id: 'B', cx: 250, cy: 300, label: 'Sunucu B' },
+                    { id: 'dest', cx: 450, cy: 200, label: 'DESTINATION' }
+                ],
+                edges: [
+                    { id: 'e1', source: 'start', target: 'A', weight: 4 },
+                    { id: 'e2', source: 'start', target: 'B', weight: 6 },
+                    { id: 'e3', source: 'A', target: 'B', weight: 1 },
+                    { id: 'e4', source: 'A', target: 'dest', weight: 5 },
+                    { id: 'e5', source: 'B', target: 'dest', weight: 2 }
+                ]
+            },
+            {
+                name: "Seviye 2: Orta", firewallCount: 2,
+                nodes: [
+                    { id: 'start', cx: 50, cy: 200, label: 'START' },
+                    { id: 'A', cx: 200, cy: 100, label: 'Sunucu A' },
+                    { id: 'B', cx: 200, cy: 300, label: 'Sunucu B' },
+                    { id: 'C', cx: 350, cy: 100, label: 'Sunucu C' },
+                    { id: 'D', cx: 350, cy: 300, label: 'Sunucu D' },
+                    { id: 'dest', cx: 500, cy: 200, label: 'DESTINATION' }
+                ],
+                edges: [
+                    { id: 'e1', source: 'start', target: 'A', weight: 3 },
+                    { id: 'e2', source: 'start', target: 'B', weight: 2 },
+                    { id: 'e3', source: 'A', target: 'C', weight: 4 },
+                    { id: 'e4', source: 'A', target: 'D', weight: 7 },
+                    { id: 'e5', source: 'B', target: 'D', weight: 5 },
+                    { id: 'e6', source: 'C', target: 'dest', weight: 2 },
+                    { id: 'e7', source: 'D', target: 'dest', weight: 3 },
+                    { id: 'e8', source: 'C', target: 'D', weight: 1 }
+                ]
+            },
+            {
+                name: "Seviye 3: Karmaşık", firewallCount: 3,
+                nodes: [
+                    { id: 'start', cx: 50, cy: 200, label: 'START' },
+                    { id: 'A', cx: 180, cy: 80, label: 'Sunucu A' },
+                    { id: 'B', cx: 180, cy: 320, label: 'Sunucu B' },
+                    { id: 'C', cx: 280, cy: 200, label: 'Sunucu C' },
+                    { id: 'D', cx: 380, cy: 80, label: 'Sunucu D' },
+                    { id: 'E', cx: 380, cy: 320, label: 'Sunucu E' },
+                    { id: 'F', cx: 480, cy: 200, label: 'Sunucu F' },
+                    { id: 'dest', cx: 550, cy: 200, label: 'DESTINATION' }
+                ],
+                edges: [
+                    { id: 'e1', source: 'start', target: 'A', weight: 4 },
+                    { id: 'e2', source: 'start', target: 'B', weight: 3 },
+                    { id: 'e3', source: 'A', target: 'C', weight: 2 },
+                    { id: 'e4', source: 'B', target: 'C', weight: 4 },
+                    { id: 'e5', source: 'A', target: 'D', weight: 6 },
+                    { id: 'e6', source: 'B', target: 'E', weight: 5 },
+                    { id: 'e7', source: 'C', target: 'D', weight: 3 },
+                    { id: 'e8', source: 'C', target: 'E', weight: 3 },
+                    { id: 'e9', source: 'C', target: 'F', weight: 5 },
+                    { id: 'e10', source: 'D', target: 'F', weight: 2 },
+                    { id: 'e11', source: 'E', target: 'F', weight: 2 },
+                    { id: 'e12', source: 'F', target: 'dest', weight: 3 },
+                    { id: 'e13', source: 'D', target: 'dest', weight: 8 }
+                ]
+            }
+        ];
+
+        let currentLevelIndex = 0;
+        let nodes = [];
+        let edges = [];
+        let path = ['start'];
+        let totalCost = 0;
+        let optimalCostForLevel = 0;
+        const board = document.getElementById('gameBoard');
+
+        function calculateMinimumCost(startId, targetId, currentEdges) {
+            let minCost = Infinity;
+            function dfs(currentId, currentCost, visited) {
+                if (currentId === targetId) {
+                    if (currentCost < minCost) minCost = currentCost;
+                    return;
+                }
+                currentEdges.forEach(edge => {
+                    if (edge.isBlocked) return; 
+                    let nextNode = null;
+                    if (edge.source === currentId && !visited.includes(edge.target)) nextNode = edge.target;
+                    if (edge.target === currentId && !visited.includes(edge.source)) nextNode = edge.source;
+                    
+                    if (nextNode) dfs(nextNode, currentCost + edge.weight, [...visited, currentId]);
+                });
+            }
+            dfs(startId, 0, []);
+            return minCost;
+        }
+
+        function initLevel(index) {
+            if (index >= levelData.length) {
+                alert("Tebrikler! Tüm ağ simülasyonlarını başarıyla tamamladın!");
+                window.location.href = "index.html"; // Sona gelince ana sayfaya döndür
+                return;
+            }
+
+            const level = levelData[index];
+            document.getElementById('level-display').innerText = level.name;
+            
+            nodes = JSON.parse(JSON.stringify(level.nodes));
+            edges = JSON.parse(JSON.stringify(level.edges)).map(e => ({...e, isBlocked: false}));
+            
+            let validConfigurationFound = false;
+            
+            while (!validConfigurationFound && level.firewallCount > 0) {
+                edges.forEach(e => e.isBlocked = false); 
+                let blockedCount = 0;
+                while (blockedCount < level.firewallCount) {
+                    let randIdx = Math.floor(Math.random() * edges.length);
+                    if (!edges[randIdx].isBlocked) {
+                        edges[randIdx].isBlocked = true;
+                        blockedCount++;
+                    }
+                }
+                
+                optimalCostForLevel = calculateMinimumCost('start', 'dest', edges);
+                if (optimalCostForLevel !== Infinity) validConfigurationFound = true;
+            }
+
+            if (level.firewallCount === 0) optimalCostForLevel = calculateMinimumCost('start', 'dest', edges);
+
+            path = ['start'];
+            totalCost = 0;
+            document.getElementById('next-level-btn').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+            
+            renderBoard();
+        }
+
+        function renderBoard() {
+            let svgContent = '';
+
+            // Çizgileri çizerken SVG özelliklerini (linecap) yumuşattık
+            edges.forEach(edge => {
+                const sourceNode = nodes.find(n => n.id === edge.source);
+                const targetNode = nodes.find(n => n.id === edge.target);
+                
+                let isPath = false;
+                for (let i = 0; i < path.length - 1; i++) {
+                    if ((path[i] === edge.source && path[i+1] === edge.target) || 
+                        (path[i] === edge.target && path[i+1] === edge.source)) {
+                        isPath = true;
+                    }
+                }
+
+                const strokeColor = edge.isBlocked ? "#e74c3c" : (isPath ? "#3498db" : "#bdc3c7");
+                const strokeWidth = edge.isBlocked ? "6" : (isPath ? "6" : "4");
+                const strokeDash = edge.isBlocked ? "8,6" : "0";
+
+                // Arka planı beyaz olan ufak bir text kutusu efekti (maliyet yazısının okunması için)
+                const midX = (sourceNode.cx + targetNode.cx) / 2;
+                const midY = (sourceNode.cy + targetNode.cy) / 2 - 10;
+
+                svgContent += `
+                    <line x1="${sourceNode.cx}" y1="${sourceNode.cy}" 
+                          x2="${targetNode.cx}" y2="${targetNode.cy}" 
+                          stroke="${strokeColor}" stroke-width="${strokeWidth}" 
+                          stroke-dasharray="${strokeDash}" stroke-linecap="round" />
+                    
+                    <circle cx="${midX}" cy="${midY-4}" r="12" fill="white" opacity="0.8"/>
+                    <text x="${midX}" y="${midY}" fill="#2c3e50" font-weight="bold" font-size="14" text-anchor="middle">${edge.weight}</text>
+                `;
+            });
+
+            nodes.forEach(node => {
+                const isCurrentNode = path[path.length - 1] === node.id;
+                const isDest = node.id === 'dest';
+                const fillColor = isCurrentNode ? "#f1c40f" : (isDest ? "#9b59b6" : "#2c3e50");
+
+                svgContent += `
+                    <g style="cursor:pointer;" onclick="handleNodeClick('${node.id}')">
+                        <circle cx="${node.cx}" cy="${node.cy}" r="16" fill="${fillColor}" stroke="#fff" stroke-width="3" />
+                        <text x="${node.cx}" y="${node.cy + 32}" fill="#34495e" font-size="13" font-weight="bold" text-anchor="middle">${node.label}</text>
+                    </g>
+                `;
+            });
+
+            board.innerHTML = svgContent;
+            updateDashboard();
+        }
+
+        window.handleNodeClick = function(nodeId) {
+            const currentNode = path[path.length - 1];
+            if (currentNode === 'dest' || currentNode === nodeId) return;
+
+            const connectingEdge = edges.find(
+                e => (e.source === currentNode && e.target === nodeId) || 
+                     (e.target === currentNode && e.source === nodeId)
+            );
+
+            if (connectingEdge) {
+                if (connectingEdge.isBlocked) {
+                    alert("CRASH! Sunucu çökmüş veya Firewall var. Lütfen 'Geri Al' butonunu kullanarak yeni bir rota belirle.");
+                } else {
+                    path.push(nodeId);
+                    totalCost += connectingEdge.weight;
+                    renderBoard();
+                    checkWinCondition();
+                }
+            }
+        }
+
+        window.undoLastStep = function() {
+            if (path.length > 1) {
+                const currentNode = path[path.length - 1];
+                const previousNode = path[path.length - 2];
+                
+                const connectingEdge = edges.find(
+                    e => (e.source === previousNode && e.target === currentNode) || 
+                         (e.target === previousNode && e.source === currentNode)
+                );
+
+                path.pop();
+                totalCost -= connectingEdge.weight;
+                
+                document.getElementById('error-message').style.display = 'none';
+                document.getElementById('success-message').style.display = 'none';
+                document.getElementById('next-level-btn').style.display = 'none';
+                
+                renderBoard();
+            }
+        }
+
+        function checkWinCondition() {
+            if (path[path.length - 1] === 'dest') {
+                if (totalCost === optimalCostForLevel) {
+                    document.getElementById('success-message').style.display = 'block';
+                    document.getElementById('error-message').style.display = 'none';
+                    document.getElementById('next-level-btn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('error-message').style.display = 'block';
+                    document.getElementById('success-message').style.display = 'none';
+                }
+            }
+        }
+
+        window.loadNextLevel = function() {
+            currentLevelIndex++;
+            initLevel(currentLevelIndex);
+        }
+
+        function updateDashboard() {
+            document.getElementById('current-node-display').innerText = path[path.length - 1];
+            document.getElementById('path-display').innerText = path.join(' ➔ ');
+            document.getElementById('cost-display').innerText = totalCost;
+        }
+
+        initLevel(currentLevelIndex);
+    </script>
+</body>
+</html>

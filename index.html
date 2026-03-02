@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siber Yönlendirici | Eğitsel Algoritma Simülasyonu</title>
+    <style>
+        /* Temel Ayarlar ve Renk Paleti */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Hero (Karşılama) Bölümü */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            color: #ecf0f1;
+        }
+
+        .btn-start {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .btn-start:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* İçerik Bölümleri */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        /* Grid Yapısı ile Kurallar ve Materyaller */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .card.alert {
+            border-top-color: var(--accent-color);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Tablo Tasarımı */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #ecf0f1;
+            color: var(--primary-color);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Siber Yönlendirici</h1>
+        <p>Ağ topolojilerini keşfet, en kısa yolu bul ve beklenmedik sunucu çökmelerine karşı kriz yönetimi stratejileri geliştir.</p>
+        <a href="oyun.html" class="btn-start">Simülasyonu Başlat</a>
+    </header>
+
+    <main class="container">
+        
+        <h2 class="section-title">Oyunun Hikayesi ve Amacı</h2>
+        <p style="text-align: center; max-width: 800px; margin: 0 auto 40px auto; font-size: 1.1rem;">
+            Bir şirket ağında çalışan <strong>Ağ Yöneticisisiniz</strong>. Çok gizli bir veri paketini (START), hedef sunucuya (DESTINATION) ulaştırmanız gerekiyor. Amacınız, veriyi ezberlenmiş yollar yerine, anlık gelişen krizlere (güvenlik duvarları ve sunucu çökmeleri) rağmen <strong>en az maliyetli</strong> yoldan hedefe ulaştırmaktır.
+        </p>
+
+        <div class="info-grid">
+            <div class="card">
+                <h3>🛠️ Modeldeki Parçalar Ne Anlama Geliyor?</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Materyal</th>
+                            <th>Ağ Kavramı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Daireler (Çiviler)</td>
+                            <td>Node (Düğüm/Sunucu)</td>
+                        </tr>
+                        <tr>
+                            <td>Çizgiler (İpler)</td>
+                            <td>Edge (Veri Yolu)</td>
+                        </tr>
+                        <tr>
+                            <td>Sayılar (İp Uzunluğu)</td>
+                            <td>Weight (İşlem Maliyeti)</td>
+                        </tr>
+                        <tr>
+                            <td>Kırmızı Çizgiler</td>
+                            <td>Firewall (Güvenlik Duvarı)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card alert">
+                <h3>⚠️ Oyun Kuralları ve Mekanikler</h3>
+                <ul>
+                    <li><strong>Maliyet Hesaplama:</strong> Geçtiğiniz her bağlantının üzerindeki sayı toplam maliyetinize eklenir.</li>
+                    <li><strong>Kırmızı Lastik Krizi:</strong> Eğer yolda kırmızı bir engel varsa sistem çökmüştür. O yoldan geçemezsiniz.</li>
+                    <li><strong>Hata Ayıklama (Debugging):</strong> Yanlış veya engelli bir yola girerseniz "Geri Al" butonu ile önceki düğüme dönebilirsiniz.</li>
+                    <li><strong>Seviye Atlama:</strong> Ancak arka planda çalışan algoritmanın bulduğu <em>gerçek en kısa yolu</em> bulursanız bir sonraki zorluk seviyesine geçebilirsiniz.</li>
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>Algoritma ve Ağ Temelleri Eğitsel Simülasyonu &copy; 2026</p>
+    </footer>
+
+</body>
+</html>
