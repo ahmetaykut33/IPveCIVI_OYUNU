@@ -25,6 +25,11 @@
             background: var(--bg-gradient); 
             color: var(--text-color); 
             min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         /* Üst Başlık ve Navigasyon */
@@ -38,12 +43,16 @@
             padding: 15px 30px;
             border-radius: 12px;
             box-shadow: var(--shadow);
+            flex-wrap: wrap; 
+            gap: 15px;
         }
 
         .header-container h2 {
             margin: 0;
             color: var(--primary-color);
             font-size: 1.5rem;
+            text-align: center;
+            flex: 1;
         }
 
         .btn-home {
@@ -54,6 +63,7 @@
             border: 2px solid var(--primary-color);
             border-radius: 20px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .btn-home:hover {
@@ -68,6 +78,7 @@
             border-radius: 20px; 
             font-size: 14px; 
             font-weight: bold;
+            white-space: nowrap;
         }
         
         /* Kontrol Butonları */
@@ -76,6 +87,7 @@
             margin: 0 auto 20px auto; 
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         button { 
@@ -87,6 +99,7 @@
             font-weight: bold; 
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1; 
         }
         
         button:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
@@ -102,30 +115,29 @@
             margin: 0 auto;
         }
 
-        /* Pano Efekti (Noktalı Arka Plan) */
+        /* Pano Efekti (SABİT BOYUT, KAYDIRILABİLİR) */
         .board-container { 
             flex: 2;
             border: 4px solid var(--primary-color); 
             background-color: var(--board-bg); 
-            /* Fiziksel pano hissi veren noktalı desen */
             background-image: radial-gradient(#bdc3c7 2px, transparent 2px);
             background-size: 30px 30px;
             border-radius: 12px; 
             padding: 15px; 
             box-shadow: var(--shadow); 
-            min-width: 600px;
-            display: flex;
-            justify-content: center;
+            width: 100%; 
+            overflow-x: auto; 
         }
 
-        /* Gösterge Paneli (Dashboard) */
+        /* Gösterge Paneli */
         .dashboard { 
             flex: 1;
             background: #fff; 
             padding: 25px; 
             border-radius: 12px; 
             box-shadow: var(--shadow); 
-            min-width: 300px; 
+            width: 100%;
+            min-width: 250px;
         }
 
         .dashboard h3 {
@@ -141,6 +153,7 @@
             border-radius: 8px;
             margin-bottom: 15px;
             border-left: 4px solid var(--secondary-color);
+            word-wrap: break-word; 
         }
 
         .stat-box p { margin: 5px 0; font-size: 15px; }
@@ -163,10 +176,55 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* SVG Çizim Ayarları */
         svg line { transition: all 0.3s ease; }
         svg circle { transition: fill 0.3s ease, r 0.2s ease; }
         svg g:hover circle { r: 18; }
+
+        /* --- MOBİL İÇİN ÖZEL DÜZENLEMELER --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 0; /* Ekranı tam doldurması için body kenar boşluklarını sıfırladık */
+                background: var(--bg-gradient); 
+            }
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px; /* Üst ve alt boşlukları ayarladık */
+                border-radius: 0; /* Oval köşeleri kaldırıp ekranı tam doldurmasını sağladık */
+                margin-bottom: 15px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+            .header-container h2 {
+                font-size: 1.3rem;
+                order: -1; 
+                margin-bottom: 15px;
+            }
+            .controls {
+                flex-direction: column;
+                padding: 0 15px; /* Butonların ekrana tam yapışmaması için iç boşluk */
+                margin-bottom: 15px;
+            }
+            button {
+                width: 100%;
+                padding: 15px; 
+            }
+            .game-layout {
+                gap: 0; /* Mobilde aradaki genel boşluğu kaldırdık */
+            }
+            .board-container {
+                border-radius: 0; /* Pano kenarlıklarını da dikleştirdik */
+                border-left: none; /* Sağ sol kenarlıkları kaldırdık tam otursun */
+                border-right: none;
+                margin-bottom: 15px;
+                padding: 10px 0; 
+            }
+            .dashboard {
+                padding: 25px 20px;
+                border-radius: 0; /* Oval köşeleri kaldırdık */
+                box-shadow: none; /* Mobilde daha temiz bir görünüm */
+                border-top: 2px solid #ecf0f1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -184,7 +242,7 @@
 
     <div class="game-layout">
         <div class="board-container">
-            <svg id="gameBoard" width="600" height="400"></svg>
+            <svg id="gameBoard" width="600" height="400" style="display: block; margin: 0 auto; min-width: 600px;"></svg>
         </div>
 
         <div class="dashboard">
@@ -197,7 +255,7 @@
 
             <div class="stat-box">
                 <p>İzlenen Rota:</p>
-                <span class="stat-value" id="path-display" style="font-size: 14px; word-wrap: break-word;">start</span>
+                <span class="stat-value" id="path-display" style="font-size: 14px;">start</span>
             </div>
 
             <div class="stat-box">
@@ -215,7 +273,6 @@
     </div>
 
     <script>
-        // --- SEVİYE VERİLERİ (Algoritma ve Mantık Aynı Kaldı) ---
         const levelData = [
             {
                 name: "Seviye 1: Kolay", firewallCount: 0,
@@ -315,7 +372,7 @@
         function initLevel(index) {
             if (index >= levelData.length) {
                 alert("Tebrikler! Tüm ağ simülasyonlarını başarıyla tamamladın!");
-                window.location.href = "index.html"; // Sona gelince ana sayfaya döndür
+                window.location.href = "index.html"; 
                 return;
             }
 
@@ -356,7 +413,6 @@
         function renderBoard() {
             let svgContent = '';
 
-            // Çizgileri çizerken SVG özelliklerini (linecap) yumuşattık
             edges.forEach(edge => {
                 const sourceNode = nodes.find(n => n.id === edge.source);
                 const targetNode = nodes.find(n => n.id === edge.target);
@@ -373,7 +429,6 @@
                 const strokeWidth = edge.isBlocked ? "6" : (isPath ? "6" : "4");
                 const strokeDash = edge.isBlocked ? "8,6" : "0";
 
-                // Arka planı beyaz olan ufak bir text kutusu efekti (maliyet yazısının okunması için)
                 const midX = (sourceNode.cx + targetNode.cx) / 2;
                 const midY = (sourceNode.cy + targetNode.cy) / 2 - 10;
 
@@ -383,8 +438,8 @@
                           stroke="${strokeColor}" stroke-width="${strokeWidth}" 
                           stroke-dasharray="${strokeDash}" stroke-linecap="round" />
                     
-                    <circle cx="${midX}" cy="${midY-4}" r="12" fill="white" opacity="0.8"/>
-                    <text x="${midX}" y="${midY}" fill="#2c3e50" font-weight="bold" font-size="14" text-anchor="middle">${edge.weight}</text>
+                    <circle cx="${midX}" cy="${midY-4}" r="14" fill="white" opacity="0.9"/>
+                    <text x="${midX}" y="${midY + 1}" fill="#2c3e50" font-weight="bold" font-size="16" text-anchor="middle">${edge.weight}</text>
                 `;
             });
 
@@ -395,8 +450,8 @@
 
                 svgContent += `
                     <g style="cursor:pointer;" onclick="handleNodeClick('${node.id}')">
-                        <circle cx="${node.cx}" cy="${node.cy}" r="16" fill="${fillColor}" stroke="#fff" stroke-width="3" />
-                        <text x="${node.cx}" y="${node.cy + 32}" fill="#34495e" font-size="13" font-weight="bold" text-anchor="middle">${node.label}</text>
+                        <circle cx="${node.cx}" cy="${node.cy}" r="18" fill="${fillColor}" stroke="#fff" stroke-width="3" />
+                        <text x="${node.cx}" y="${node.cy + 36}" fill="#34495e" font-size="14" font-weight="bold" text-anchor="middle">${node.label}</text>
                     </g>
                 `;
             });
